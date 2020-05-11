@@ -1,0 +1,16 @@
+
+.top-tools {
+  .edit-modes {
+    & > button ~ button {
+      margin-left: 10px;
+    }
+    button {
+      &.selected {
+        background-color: #bfbfbf;
+      }
+    }
+  }
+  .drawer-container {
+    padding: 10px 0;
+  }
+}
