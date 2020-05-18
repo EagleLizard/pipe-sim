@@ -14,7 +14,7 @@ export const EDIT_MODES = {
 
 export const EDITOR_STATES = {
   DRAW: 'DRAW',
-  DEFAULT: 'DEFAULT', // indicates no current action in-progress
+  PASSIVE: 'PASSIVE', // indicates no current action in-progress
 };
 
 const EDIT_BUTTONS = [

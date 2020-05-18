@@ -13,15 +13,17 @@ import {
 
 import './app.scss';
 import { ENTITY_ENUM } from '../world/entities/entity-enum';
+import { BoundingRect } from '../world/entities/debug/bounding-rect';
 
 export function App() {
   const [ entities, _setEntities ] = useState([]);
+  const [ debugEntities, setDebugEntities ] = useState([]);
   const [ running, setRunning ] = useState(world.running);
   const [ epochMs, setEpochMs ] = useState(world.epochMs);
   const [ drawRt, setDrawRt ] = useState(null);
 
   const [ editMode, setEditMode ] = useState(null);
-  const [ editState, setEditState ] = useState(null);
+  const [ editState, setEditState ] = useState(EDITOR_STATES.PASSIVE);
   const [ editAction, setEditAction ] = useState(null);
 
   const [ pipeOrigin, setPipeOrigin ] = useState({});
@@ -34,7 +36,9 @@ export function App() {
 
   useEffect(() => {
     let worldDeregisterCb, drawDeregisterCb, _drawRt;
-    _drawRt = new Runtime();
+    _drawRt = new Runtime({
+      tickInterval: 1000 / 120 // 120 fps
+    });
     setDrawRt(_drawRt);
 
     worldDeregisterCb = world.onTick(() => {
@@ -78,13 +82,43 @@ export function App() {
   };
 
   const handleMouseMove = (evt) => {
-    if(editState === EDITOR_STATES.DRAW) {
-      if(
-        (editAction === ENTITY_ENUM.PIPE)
-        && pipeRef.current
-        && (pipeRef.current.entityType === ENTITY_ENUM.PIPE)
-      ) {
-        pipeRef.current.setEndPoint(evt.x, evt.y);
+    switch(editState) {
+      case EDITOR_STATES.DRAW:
+        handleDrawMouseMove(evt);
+        break;
+      case EDITOR_STATES.PASSIVE:
+        handlePassiveMouseMove(evt);
+        break;
+    }
+
+    function handleDrawMouseMove(evt) {
+      switch(editAction) {
+        case ENTITY_ENUM.PIPE:
+          handlePipeDrawMouseMove(evt);
+          break;
+      }
+      function handlePipeDrawMouseMove(evt) {
+        if(pipeRef.current && (pipeRef.current.entityType === ENTITY_ENUM.PIPE)) {
+          pipeRef.current.setEndPoint(evt.x, evt.y);
+        }
+      }
+    };
+
+    function handlePassiveMouseMove(evt) {
+      switch(editAction) {
+        case ENTITY_ENUM.PIPE:
+          handlePipePassiveMouseMove(evt);
+          break;
+      }
+      function handlePipePassiveMouseMove(evt) {
+        let collidedEntities, boundingRects;
+        collidedEntities = world.getBoundingCollisionsByPoint(evt);
+        boundingRects = collidedEntities.map(entity => {
+          return new BoundingRect(entity.id, {
+            boundingRect: entity.boundingRect
+          });
+        });
+        setDebugEntities(boundingRects);
       }
     }
   };
@@ -108,8 +142,6 @@ export function App() {
           break;
       }
     }
-    console.log(mode);
-    console.log(selectedEditAction);
     setEditMode(mode);
     setEditAction(selectedEditAction);
   };
@@ -137,6 +169,7 @@ export function App() {
           onClick={(e) => handleClick(e)}
           onMouseMove={(e) => handleMouseMove(e)}
           entities={entities}
+          debugEntities={debugEntities}
         />
       </div>
     </div>

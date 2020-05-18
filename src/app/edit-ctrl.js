@@ -65,11 +65,11 @@ function getEditState({
 function getAddEditState({ editAction, editState }) {
   switch(editAction) {
     case ENTITY_ENUM.PIPE:
-      if(!editState || editState === EDITOR_STATES.DEFAULT) {
+      if(!editState || editState === EDITOR_STATES.PASSIVE) {
         return EDITOR_STATES.DRAW;
       }
       if(editState === EDITOR_STATES.DRAW) {
-        return EDITOR_STATES.DEFAULT;
+        return EDITOR_STATES.PASSIVE;
       }
       break;
     case ENTITY_ENUM.RESERVOIR:

@@ -5,6 +5,8 @@ import { Runtime } from './runtime';
 import { Station } from './entities/station/station';
 import { Pipe } from './entities/pipe/pipe';
 
+import { isPointInBoundingRect } from './geometry/collision';
+
 export class World {
   constructor() {
     this.graph = new Graph({
@@ -46,6 +48,20 @@ export class World {
     pipe = new Pipe(this.getId(), { x, y });
     this.entities.push(pipe);
     return pipe;
+  }
+
+  getBoundingCollisionsByPoint(point) {
+    let collidedEntities;
+    collidedEntities = this.entities.reduce((acc, curr) => {
+      let collision, boundingRect;
+      boundingRect = curr.boundingRect;
+      collision = isPointInBoundingRect(point, curr.boundingRect);
+      if(collision) {
+        acc.push(curr);
+      }
+      return acc;
+    }, []);
+    return collidedEntities;
   }
 
   get running() {

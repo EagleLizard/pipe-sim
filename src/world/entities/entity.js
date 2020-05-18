@@ -1,6 +1,7 @@
 
 export class Entity {
-  constructor(id) {
+  constructor(id, entityType) {
     this.id = id;
+    this.entityType = entityType;
   }
 }

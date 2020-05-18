@@ -18,8 +18,9 @@ export function SimView(props) {
     if(canvasRef.current !== null && context !== null) {
       clearView(context, canvasRef.current);
       drawEntities(context, props.entities);
+      drawEntities(context, props.debugEntities);
     }
-  }, [ props.entities ]);
+  }, [ props.entities, props.debugEntities ]);
 
   const handleClick = (evt) => {
     let eventData, canvasRect;

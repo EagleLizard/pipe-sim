@@ -9,10 +9,6 @@ export const configService = {
 };
 
 function setEditorConfig(mode, action) {
-  console.log('mode');
-  console.log(mode);
-  console.log('action');
-  console.log(action);
   store.set(EDITOR_CONFIG_KEY, {
     mode,
     // action,

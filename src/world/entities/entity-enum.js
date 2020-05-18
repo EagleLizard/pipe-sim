@@ -5,4 +5,6 @@ export const ENTITY_ENUM = {
   ROUTE: 'ROUTE',
   PIPE: 'PIPE',
   RESERVOIR: 'RESERVOIR',
+  // debug entities
+  BOUNDING_RECT: 'BOUNDING_RECT',
 };
