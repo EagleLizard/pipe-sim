@@ -9,29 +9,21 @@ import { configService, EditorConfig } from '../config-service';
 import { AddDrawer, AddDrawerItem } from './add-drawer/add-drawer';
 import { EditDrawer, EditDrawerItem } from './edit-drawer/edit-drawer';
 
-export interface EditModes {
-  ADD: 'ADD';
-  EDIT: 'EDIT';
-}
-
-export const EDIT_MODES: EditModes = {
-  ADD: 'ADD',
-  EDIT: 'EDIT',
+export enum EDIT_MODES {
+  ADD = 'ADD',
+  EDIT = 'EDIT',
 };
 
-export interface EditorStates {
-  DRAW: 'DRAW';
-  PASSIVE: 'PASSIVE';
-}
-
-export const EDITOR_STATES: EditorStates = {
-  DRAW: 'DRAW',
-  PASSIVE: 'PASSIVE', // indicates no current action in-progress
+export enum EDITOR_STATES {
+  DRAW = 'DRAW',
+  PASSIVE = 'PASSIVE', // indicates no current action in-progress
+  SELECTING = 'SELECTING',
+  SELECTED = 'SELECTED',
 };
 
 interface EditButton {
   label: string;
-  mode: keyof EditModes;
+  mode: EDIT_MODES;
 }
 
 const EDIT_BUTTONS: EditButton[] = [
@@ -47,13 +39,13 @@ const EDIT_BUTTONS: EditButton[] = [
 
 interface TopToolsProps {
   running: boolean;
-  onEditorChange: (mode: keyof EditModes, selected?: AddDrawerItem | EditDrawerItem) => unknown;
+  onEditorChange: (mode: EDIT_MODES, selected?: AddDrawerItem | EditDrawerItem) => unknown;
   onPlayClick: (evt: MouseEvent) => unknown;
 }
 
 export function TopTools(props: TopToolsProps) {
 
-  const [ editMode, setEditMode ] = useState<keyof EditModes>();
+  const [ editMode, setEditMode ] = useState<EDIT_MODES>();
   const [ selectedAddItem, setSelectedAddItem ] = useState<AddDrawerItem>();
   const [ selectedEditItem, setSelectedEditItem ] = useState<EditDrawerItem>();
 
@@ -78,7 +70,7 @@ export function TopTools(props: TopToolsProps) {
     onEditorChange(editMode, selectedItem);
   };
 
-  const onEditorChange = (mode: keyof EditModes, selected?: AddDrawerItem | EditDrawerItem) => {
+  const onEditorChange = (mode: EDIT_MODES, selected?: AddDrawerItem | EditDrawerItem) => {
     console.log('onEditorChange in topTools');
     if(mode === undefined) {
       mode = editMode;
@@ -98,7 +90,7 @@ export function TopTools(props: TopToolsProps) {
   };
 
   useEffect(() => {
-    let editorConfig: EditorConfig, mode: keyof EditModes, action: AddDrawerItem | EditDrawerItem;
+    let editorConfig: EditorConfig, mode: EDIT_MODES, action: AddDrawerItem | EditDrawerItem;
     editorConfig = configService.getEditorConfig();
     if(editorConfig !== undefined) {
       mode = editorConfig.mode;

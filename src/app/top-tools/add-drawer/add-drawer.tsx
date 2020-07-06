@@ -3,11 +3,11 @@ import './add-drawer.scss';
 import React, { useState, useEffect } from 'react';
 import { Tram, AccountBalance, SwapVert, TrendingFlat, Opacity, SvgIconComponent } from '@material-ui/icons';
 
-import { ENTITY_ENUM, EntityEnum } from '../../../world/entities/entity-enum';
+import { ENTITY_ENUM } from '../../../world/entities/entity-enum';
 import { DrawerItem } from '../drawer-item';
 
 export interface AddDrawerItem extends DrawerItem {
-  entityType: keyof EntityEnum;
+  entityType: ENTITY_ENUM;
 }
 
 const ADD_DRAWER_ITEMS: AddDrawerItem[] = [

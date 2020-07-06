@@ -1,11 +1,11 @@
 
 import store from 'store2';
-import { EditModes } from './top-tools/top-tools';
+import { EDIT_MODES } from './top-tools/top-tools';
 import { AddDrawerItem } from './top-tools/add-drawer/add-drawer';
 import { EditDrawerItem } from './top-tools/edit-drawer/edit-drawer';
 
 export interface EditorConfig {
-  mode: keyof EditModes;
+  mode: EDIT_MODES;
   action: AddDrawerItem | EditDrawerItem;
 }
 
@@ -16,7 +16,7 @@ export const configService = {
   getEditorConfig,
 };
 
-function setEditorConfig(mode: keyof EditModes, action: AddDrawerItem | EditDrawerItem) {
+function setEditorConfig(mode: EDIT_MODES, action: AddDrawerItem | EditDrawerItem) {
   store.set(EDITOR_CONFIG_KEY, {
     mode,
     // action,

@@ -4,7 +4,7 @@ export function toRadians(degrees: number) {
   return degrees * (Math.PI / 180);
 }
 
-export function getVectorPoint(angle: number, length: number) {
+export function getVectorPoint(angle: number, length: number): Point {
   let x, y;
   x = length * Math.cos(angle);
   y = length * Math.sin(angle);
@@ -24,4 +24,12 @@ export function rotate(originAngle: number, degrees: number) {
   // originAngle - original angle in radians
   // degress - degrees to rotate
   radians = (Math.PI / 180) * degrees;
+}
+
+export function getDistance(p1: Point, p2:Point) {
+  let a: number, b: number, c: number;
+  a = p1.x - p2.x;
+  b = p1.y - p2.y;
+  c = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+  return c;
 }

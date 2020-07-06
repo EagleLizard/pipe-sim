@@ -5,6 +5,7 @@ import {
   getAngle,
   toRadians,
   getVectorPoint,
+  getDistance,
 } from '../../geometry/trig';
 import { Point } from '../../geometry/shapes';
 
@@ -44,7 +45,6 @@ export class Pipe extends Entity {
     ctx.moveTo(p1.x, p1.y);
     ctx.lineTo(p2.x, p2.y);
     ctx.stroke();
-
     // draw arrow
     ctx.beginPath();
     ctx.moveTo(p2.x, p2.y);
@@ -92,6 +92,12 @@ export class Pipe extends Entity {
   get canDraw() {
     return (this.endPoint.x !== undefined) && (this.endPoint.y !== undefined);
   }
+}
+
+function getPointsOnLine(p1: Point, p2: Point, spacing: number) {
+  let distance: number, numPoints: number, points: Point[];
+  distance = getDistance(p1, p2);
+  numPoints = Math.floor(distance / spacing);
 }
 
 // Returns two points to draw a triangle, assuming an origin point of 0

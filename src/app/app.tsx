@@ -1,3 +1,4 @@
+import './app.scss';
 import React, { useState, useEffect, useRef } from 'react';
 
 import { world } from './world-service';
@@ -9,10 +10,7 @@ import {
   TopTools,
   EDIT_MODES,
   EDITOR_STATES,
-  EditorStates,
 } from './top-tools/top-tools';
-
-import './app.scss';
 import { ENTITY_ENUM } from '../world/entities/entity-enum';
 import { BoundingRect } from '../world/entities/debug/bounding-rect';
 import { Point } from '../world/geometry/shapes';
@@ -20,6 +18,7 @@ import { Entity } from '../world/entities/entity';
 import { Pipe } from '../world/entities/pipe/pipe';
 import { EditDrawerItem } from './top-tools/edit-drawer/edit-drawer';
 import { AddDrawerItem } from './top-tools/add-drawer/add-drawer';
+import { EDIT_ACTIONS } from './top-tools/edit-actions';
 
 export function App() {
   const [ entities, _setEntities ] = useState([]);
@@ -29,7 +28,7 @@ export function App() {
   const [ drawRt, setDrawRt ] = useState(null);
 
   const [ editMode, setEditMode ] = useState(null);
-  const [ editState, setEditState ] = useState<keyof EditorStates>(EDITOR_STATES.PASSIVE);
+  const [ editState, setEditState ] = useState<EDITOR_STATES>(EDITOR_STATES.PASSIVE);
   const [ editAction, setEditAction ] = useState(null);
 
   const [ pipeOrigin, setPipeOrigin ] = useState({});
@@ -65,8 +64,8 @@ export function App() {
   }, []);
 
   const handleClick = (evt: Point) => {
-    let nextEditState: keyof EditorStates, ctrlResult;
-    nextEditState = editCtrl.getEditState({
+    let nextEditState: EDITOR_STATES, ctrlResult;
+    nextEditState = editCtrl.getEditorState({
       editMode,
       editAction,
       editState,
@@ -95,6 +94,9 @@ export function App() {
       case EDITOR_STATES.PASSIVE:
         handlePassiveMouseMove(evt);
         break;
+      case EDITOR_STATES.SELECTING:
+        handlePassiveMouseMove(evt);
+        break;
     }
 
     function handleDrawMouseMove(evt: Point) {
@@ -111,21 +113,26 @@ export function App() {
     };
 
     function handlePassiveMouseMove(evt: Point) {
+      let collidedEntities, boundingRects;
       switch(editAction) {
         case ENTITY_ENUM.PIPE:
           handlePipePassiveMouseMove(evt);
           break;
+        case EDIT_ACTIONS.DELETE:
+
       }
-      function handlePipePassiveMouseMove(evt: Point) {
-        let collidedEntities, boundingRects;
-        collidedEntities = world.getBoundingCollisionsByPoint(evt);
-        boundingRects = collidedEntities.map(entity => {
-          return new BoundingRect(entity.id, {
-            boundingRect: entity.boundingRect
-          });
+      collidedEntities = world.getBoundingCollisionsByPoint(evt);
+      boundingRects = collidedEntities.map(entity => {
+        return new BoundingRect(entity.id, {
+          boundingRect: entity.boundingRect
         });
-        setDebugEntities(boundingRects);
+      });
+      setDebugEntities(boundingRects);
+      
+      function handlePipePassiveMouseMove(evt: Point) {
+        
       }
+
     }
   };
 
@@ -136,8 +143,8 @@ export function App() {
     setRunning(world.running);
   };
 
-  const handleEditorChange = (mode: keyof typeof EDIT_MODES, selected: AddDrawerItem | EditDrawerItem) => {
-    let selectedEditAction;
+  const handleEditorChange = (mode: EDIT_MODES, selected: AddDrawerItem | EditDrawerItem) => {
+    let selectedEditAction: ENTITY_ENUM | EDIT_ACTIONS, nextEditState: EDITOR_STATES;
     if(selected !== undefined) {
       switch(mode) {
         case EDIT_MODES.ADD:
@@ -148,7 +155,13 @@ export function App() {
           break;
       }
     }
+    nextEditState = editCtrl.getEditorState({
+      editMode: mode,
+      editAction: selectedEditAction,
+      editState,
+    });
     setEditMode(mode);
+    setEditState(nextEditState);
     setEditAction(selectedEditAction);
   };
 

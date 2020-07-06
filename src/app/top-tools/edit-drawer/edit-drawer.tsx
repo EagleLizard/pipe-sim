@@ -9,11 +9,11 @@ import {
   PanTool as PanToolIcon,
 } from '@material-ui/icons';
 
-import { EDIT_ACTIONS, EditActions } from '../edit-actions';
+import { EDIT_ACTIONS } from '../edit-actions';
 import { DrawerItem } from '../drawer-item';
 
 export interface EditDrawerItem extends DrawerItem {
-  editType: keyof EditActions;
+  editType: EDIT_ACTIONS;
 }
 
 const EDIT_DRAWER_ITEMS: EditDrawerItem[] = [
