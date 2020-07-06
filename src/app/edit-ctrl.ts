@@ -1,21 +1,29 @@
 
 import { world } from './world-service';
 
-import { ENTITY_ENUM } from '../world/entities/entity-enum';
-import { EDIT_MODES, EDITOR_STATES } from './top-tools/top-tools';
-import { EDIT_ACTIONS } from './top-tools/edit-actions';
+import { ENTITY_ENUM, EntityEnum } from '../world/entities/entity-enum';
+import { EDIT_MODES, EDITOR_STATES, EditModes, EditorStates } from './top-tools/top-tools';
+import { EDIT_ACTIONS, EditActions } from './top-tools/edit-actions';
+import { Point } from '../world/geometry/shapes';
 
 export const editCtrl = {
   handleClick,
   getEditState,
 };
 
+interface HandleClickParams {
+  evt: Point;
+  editMode: keyof EditModes;
+  editAction: keyof EntityEnum;
+  editState: keyof EditorStates;
+}
+
 function handleClick({
   evt,
   editMode,
   editAction,
   editState,
-}) {
+}: HandleClickParams) {
   if(!editMode || !editAction) {
     return;
   }
@@ -31,11 +39,17 @@ function handleClick({
   }
 }
 
+interface HandleAddClickParams {
+  evt: Point;
+  editAction: keyof EntityEnum;
+  editState: keyof EditorStates;
+}
+
 function handleAddClick({
   evt,
   editAction,
   editState,
-}) {
+}: HandleAddClickParams) {
   console.log('handleAddClick');
   console.log(`editAction: ${editAction}`);
   switch(editAction) {
@@ -44,25 +58,47 @@ function handleAddClick({
   }
 }
 
-function handleAddPipeClick({ evt, editState }) {
+interface HandleAddPipeClickParams {
+  evt: Point;
+  editState: keyof EditorStates;
+}
+
+function handleAddPipeClick({
+  evt,
+  editState,
+}: HandleAddPipeClickParams) {
   switch(editState) {
     case EDITOR_STATES.DRAW:
       return world.createPipe(evt.x, evt.y);
   }
 }
 
+interface GetEditStateParams {
+  editMode: keyof EditModes;
+  editAction: keyof EntityEnum;
+  editState: keyof EditorStates;
+}
+
 function getEditState({
   editMode,
   editAction,
   editState,
-}) {
+}: GetEditStateParams) {
   switch(editMode) {
     case EDIT_MODES.ADD:
       return getAddEditState({ editAction, editState });
   }
 }
 
-function getAddEditState({ editAction, editState }) {
+interface GetAddEditStateParams {
+  editAction: keyof EntityEnum;
+  editState: keyof EditorStates;
+}
+
+function getAddEditState({
+  editAction,
+  editState,
+}: GetAddEditStateParams) {
   switch(editAction) {
     case ENTITY_ENUM.PIPE:
       if(!editState || editState === EDITOR_STATES.PASSIVE) {
@@ -77,11 +113,10 @@ function getAddEditState({ editAction, editState }) {
   }
 }
 
-function handleEditClick(evt, editAction) {
-  const { x, y } = evt;
+function handleEditClick(evt: Point, editAction: keyof EditActions) {
   switch(editAction) {
     case EDIT_ACTIONS.SELECT:
-      return select(x, y);
+      return select(evt);
     case EDIT_ACTIONS.MOVE:
       break;
     case EDIT_ACTIONS.LINE:
@@ -95,6 +130,6 @@ function handleEditClick(evt, editAction) {
   }
 }
 
-function select(x, y) {
+function select(evt: Point) {
   
 }

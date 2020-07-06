@@ -1,16 +1,24 @@
 
-import { Entity } from '../entity';
+import { Entity, EntityBoundingRect } from '../entity';
 import { ENTITY_ENUM } from '../entity-enum';
 
 import { boundingRectToRect } from '../../geometry/collision';
+import { Rect } from '../../geometry/shapes';
+
+interface BoundingRectOptions {
+  boundingRect: EntityBoundingRect;
+}
 
 export class BoundingRect extends Entity {
-  constructor(id, options) {
+  rect: Rect;
+  _boundingRect: EntityBoundingRect;
+  constructor(id: number | string, options: BoundingRectOptions) {
     super(id, ENTITY_ENUM.BOUNDING_RECT);
+    this._boundingRect = options.boundingRect;
     this.rect = boundingRectToRect(options.boundingRect);
   }
 
-  draw(ctx) {
+  draw(ctx: CanvasRenderingContext2D) {
     let lastStyle;
     lastStyle = ctx.strokeStyle;
     ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
@@ -25,5 +33,9 @@ export class BoundingRect extends Entity {
     ctx.stroke();
     // reset style
     ctx.strokeStyle = lastStyle;
+  }
+
+  get boundingRect() {
+    return this._boundingRect;
   }
 }

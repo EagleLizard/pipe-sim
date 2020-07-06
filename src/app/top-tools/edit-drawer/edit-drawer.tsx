@@ -1,4 +1,5 @@
 
+import '../edit-drawer/edit-drawer.scss';
 import React, { useState, useEffect } from 'react';
 import { 
   Add as AddIcon,
@@ -8,9 +9,14 @@ import {
   PanTool as PanToolIcon,
 } from '@material-ui/icons';
 
-import { EDIT_ACTIONS } from '../edit-actions';
+import { EDIT_ACTIONS, EditActions } from '../edit-actions';
+import { DrawerItem } from '../drawer-item';
 
-const EDIT_DRAWER_ITEMS = [
+export interface EditDrawerItem extends DrawerItem {
+  editType: keyof EditActions;
+}
+
+const EDIT_DRAWER_ITEMS: EditDrawerItem[] = [
   {
     editType: EDIT_ACTIONS.SELECT,
     icon: AddIcon,
@@ -38,12 +44,15 @@ const EDIT_DRAWER_ITEMS = [
   },
 ];
 
-import '../edit-drawer/edit-drawer.scss';
+interface EditDrawerProps {
+  onSelect: (selected: EditDrawerItem) => unknown;
+  selected: EditDrawerItem;
+}
 
-export function EditDrawer(props) {
-  const [ selected, setSelected ] = useState();
+export function EditDrawer(props: EditDrawerProps) {
+  const [ selected, setSelected ] = useState<EditDrawerItem>();
 
-  const handleClick = (selected) => {
+  const handleClick = (selected: EditDrawerItem) => {
     props.onSelect(selected);
   };
 

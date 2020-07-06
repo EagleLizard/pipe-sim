@@ -1,23 +1,40 @@
-import React, { useState, useEffect } from 'react';
+
+import './top-tools.scss';
+import React, { useState, useEffect, MouseEvent } from 'react';
 import { IconButton, Button } from '@material-ui/core';
 import { PlayArrow, Pause } from '@material-ui/icons';
 
-import { configService } from '../config-service';
+import { configService, EditorConfig } from '../config-service';
 
-import { AddDrawer } from './add-drawer/add-drawer';
-import { EditDrawer } from './edit-drawer/edit-drawer';
+import { AddDrawer, AddDrawerItem } from './add-drawer/add-drawer';
+import { EditDrawer, EditDrawerItem } from './edit-drawer/edit-drawer';
 
-export const EDIT_MODES = {
+export interface EditModes {
+  ADD: 'ADD';
+  EDIT: 'EDIT';
+}
+
+export const EDIT_MODES: EditModes = {
   ADD: 'ADD',
   EDIT: 'EDIT',
 };
 
-export const EDITOR_STATES = {
+export interface EditorStates {
+  DRAW: 'DRAW';
+  PASSIVE: 'PASSIVE';
+}
+
+export const EDITOR_STATES: EditorStates = {
   DRAW: 'DRAW',
   PASSIVE: 'PASSIVE', // indicates no current action in-progress
 };
 
-const EDIT_BUTTONS = [
+interface EditButton {
+  label: string;
+  mode: keyof EditModes;
+}
+
+const EDIT_BUTTONS: EditButton[] = [
   {
     label: 'ADD',
     mode: EDIT_MODES.ADD,
@@ -28,36 +45,40 @@ const EDIT_BUTTONS = [
   },
 ];
 
-import './top-tools.scss';
+interface TopToolsProps {
+  running: boolean;
+  onEditorChange: (mode: keyof EditModes, selected?: AddDrawerItem | EditDrawerItem) => unknown;
+  onPlayClick: (evt: MouseEvent) => unknown;
+}
 
-export function TopTools(props) {
+export function TopTools(props: TopToolsProps) {
 
-  const [ editMode, setEditMode ] = useState();
-  const [ selectedAddItem, setSelectedAddItem ] = useState();
-  const [ selectedEditItem, setSelectedEditItem ] = useState();
+  const [ editMode, setEditMode ] = useState<keyof EditModes>();
+  const [ selectedAddItem, setSelectedAddItem ] = useState<AddDrawerItem>();
+  const [ selectedEditItem, setSelectedEditItem ] = useState<EditDrawerItem>();
 
-  const handleModeButtonClick = editButton => {
+  const handleModeButtonClick = (editButton: EditButton) => {
     setEditMode(editButton.mode);
     onEditorChange(editButton.mode);
   };
 
-  const handlePlayClick = (evt) => {
+  const handlePlayClick = (evt: MouseEvent) => {
     props.onPlayClick(evt);
   };
 
-  const handleAddItemSelect = selectedItem => {
+  const handleAddItemSelect = (selectedItem: AddDrawerItem) => {
     console.log(selectedItem);
     setSelectedAddItem(selectedItem);
     onEditorChange(editMode, selectedItem);
   };
 
-  const handleEditItemSelect = selectedItem => {
+  const handleEditItemSelect = (selectedItem: EditDrawerItem) => {
     console.log(selectedItem);
     setSelectedEditItem(selectedItem);
     onEditorChange(editMode, selectedItem);
   };
 
-  const onEditorChange = (mode, selected) => {
+  const onEditorChange = (mode: keyof EditModes, selected?: AddDrawerItem | EditDrawerItem) => {
     console.log('onEditorChange in topTools');
     if(mode === undefined) {
       mode = editMode;
@@ -77,14 +98,19 @@ export function TopTools(props) {
   };
 
   useEffect(() => {
-    let editorConfig, mode, action;
+    let editorConfig: EditorConfig, mode: keyof EditModes, action: AddDrawerItem | EditDrawerItem;
     editorConfig = configService.getEditorConfig();
     if(editorConfig !== undefined) {
       mode = editorConfig.mode;
       action = editorConfig.action;
     }
     setEditMode(mode);
-    setSelectedEditItem(action);
+    switch(mode) {
+      case EDIT_MODES.ADD:
+        setSelectedAddItem(action as AddDrawerItem);
+      case EDIT_MODES.EDIT:
+        setSelectedEditItem(action as EditDrawerItem);
+    }
     onEditorChange(mode, action);
   }, []);
 
@@ -117,7 +143,7 @@ export function TopTools(props) {
             <Button
               key={idx}
               variant="contained"
-              disableElevation="true"
+              disableElevation={true}
               className={`edit-mode-button ${(editButton.mode === editMode) ? 'selected' : ''}`}
               onClick={e => handleModeButtonClick(editButton)}>
               {

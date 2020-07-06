@@ -1,10 +1,16 @@
 
+import './add-drawer.scss';
 import React, { useState, useEffect } from 'react';
-import { Tram, AccountBalance, SwapVert, TrendingFlat, Opacity } from '@material-ui/icons';
+import { Tram, AccountBalance, SwapVert, TrendingFlat, Opacity, SvgIconComponent } from '@material-ui/icons';
 
-import { ENTITY_ENUM } from '../../../world/entities/entity-enum';
+import { ENTITY_ENUM, EntityEnum } from '../../../world/entities/entity-enum';
+import { DrawerItem } from '../drawer-item';
 
-const ADD_DRAWER_ITEMS = [
+export interface AddDrawerItem extends DrawerItem {
+  entityType: keyof EntityEnum;
+}
+
+const ADD_DRAWER_ITEMS: AddDrawerItem[] = [
   // {
   //   entityType: ENTITY_ENUM.STATION,
   //   icon: AccountBalance,
@@ -32,12 +38,15 @@ const ADD_DRAWER_ITEMS = [
   },
 ];
 
-import './add-drawer.scss';
+interface AddDrawerProps {
+  onSelect: (selected: AddDrawerItem) => unknown;
+  selected: AddDrawerItem;
+}
 
-export function AddDrawer(props) {
-  const [ selected, setSelected ] = useState();
+export function AddDrawer(props: AddDrawerProps) {
+  const [ selected, setSelected ] = useState<AddDrawerItem>();
 
-  const handleClick = (selected) => {
+  const handleClick = (selected: AddDrawerItem) => {
     props.onSelect(selected);
   };
 

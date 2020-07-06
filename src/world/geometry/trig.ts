@@ -1,16 +1,17 @@
+import { Point } from "./shapes";
 
-export function toRadians(degrees) {
+export function toRadians(degrees: number) {
   return degrees * (Math.PI / 180);
 }
 
-export function getVectorPoint(angle, length) {
+export function getVectorPoint(angle: number, length: number) {
   let x, y;
   x = length * Math.cos(angle);
   y = length * Math.sin(angle);
   return { x, y };
 }
 
-export function getAngle(p1, p2) {
+export function getAngle(p1: Point , p2: Point) {
   let dy, dx, theta;
   dy = p2.y - p1.y;
   dx = p2.x - p1.x;
@@ -18,7 +19,7 @@ export function getAngle(p1, p2) {
   return theta;
 }
 
-export function rotate(originAngle, degrees) {
+export function rotate(originAngle: number, degrees: number) {
   let radians;
   // originAngle - original angle in radians
   // degress - degrees to rotate

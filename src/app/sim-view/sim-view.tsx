@@ -1,11 +1,23 @@
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, MouseEvent } from 'react';
+import _debounce from 'lodash.debounce';
 
-export function SimView(props) {
-  const canvasRef = useRef(null);
+import { Point } from '../../world/geometry/shapes';
+import { EventBusy } from '@material-ui/icons';
+import { Entity } from '../../world/entities/entity';
+
+interface SimViewProps {
+  onClick: (e: Point) => unknown;
+  onMouseMove: (e: Point) => unknown; 
+  entities: Entity[];
+  debugEntities: Entity[];
+}
+
+export function SimView(props: SimViewProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ width, setWidth ] = useState(600);
   const [ height, setHeight ] = useState(600 / (4 / 3));
-  const [ context, setContext ] = useState(null);
+  const [ context, setContext ] = useState<CanvasRenderingContext2D>(null);
 
   const onClick = props.onClick || (() => {});
   const onMouseMove = props.onMouseMove || (() => {});
@@ -22,8 +34,8 @@ export function SimView(props) {
     }
   }, [ props.entities, props.debugEntities ]);
 
-  const handleClick = (evt) => {
-    let eventData, canvasRect;
+  const handleClick = (evt: MouseEvent<HTMLCanvasElement>) => {
+    let eventData: Point, canvasRect;
     canvasRect = canvasRef.current.getBoundingClientRect();
     eventData = {
       x: evt.clientX - canvasRect.left,
@@ -32,8 +44,8 @@ export function SimView(props) {
     onClick(eventData);
   };
 
-  const handleMouseMove = (evt) => {
-    let eventData, canvasRect;
+  const handleMouseMove = (evt: MouseEvent<HTMLCanvasElement>) => {
+    let eventData: Point, canvasRect;
     canvasRect = canvasRef.current.getBoundingClientRect();
     eventData = {
       x: evt.clientX - canvasRect.left,
@@ -42,21 +54,26 @@ export function SimView(props) {
     onMouseMove(eventData);
   };
 
+  const debouncedMouseMove = _debounce(handleMouseMove, 50);
+
   return (
     <canvas
       ref={canvasRef}
       width={width}
       height={height}
       onClick={(e) => handleClick(e)}
-      onMouseMove={(e) => handleMouseMove(e)}
+      onMouseMove={(e) => {
+        e.persist();
+        debouncedMouseMove(e);
+      }}
     />
   );
 }
 
-function drawEntities(ctx, entities) {
+function drawEntities(ctx: CanvasRenderingContext2D, entities: Entity[]) {
   entities.forEach(entity => entity.draw(ctx));
 }
 
-function clearView(ctx, canvasEl) {
+function clearView(ctx: CanvasRenderingContext2D, canvasEl: HTMLCanvasElement) {
   ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
 }

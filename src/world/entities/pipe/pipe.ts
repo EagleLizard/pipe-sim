@@ -6,18 +6,27 @@ import {
   toRadians,
   getVectorPoint,
 } from '../../geometry/trig';
+import { Point } from '../../geometry/shapes';
+
+interface PipeOptions {
+  x: number;
+  y: number;
+}
 
 export class Pipe extends Entity {
-  constructor(id, options) {
+  originPoint: Point;
+  endPoint: Point;
+
+  constructor(id: number | string, options: PipeOptions) {
     super(id, ENTITY_ENUM.PIPE);
     this.originPoint = {
       x: options.x,
       y: options.y,
     };
-    this.endPoint = {};
+    this.endPoint = ({} as Point);
   }
 
-  draw(ctx) {
+  draw(ctx: CanvasRenderingContext2D) {
     let p1, p2, pipeAngle, arrowPoints;
     if(!this.canDraw) return;
     p1 = {
@@ -75,7 +84,7 @@ export class Pipe extends Entity {
     };
   }
 
-  setEndPoint(x, y) {
+  setEndPoint(x: number, y:number) {
     this.endPoint.x = x;
     this.endPoint.y = y;
   }
@@ -86,7 +95,7 @@ export class Pipe extends Entity {
 }
 
 // Returns two points to draw a triangle, assuming an origin point of 0
-function getArrowPoints(originAngle, length, arrowAngle = 315) {
+function getArrowPoints(originAngle: number, length: number, arrowAngle = 315) {
   let angleA, angleB, pA, pB;
   angleA = originAngle + toRadians(arrowAngle);
   angleB = originAngle - toRadians(arrowAngle);

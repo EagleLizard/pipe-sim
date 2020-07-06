@@ -9,11 +9,17 @@ import {
   TopTools,
   EDIT_MODES,
   EDITOR_STATES,
+  EditorStates,
 } from './top-tools/top-tools';
 
 import './app.scss';
 import { ENTITY_ENUM } from '../world/entities/entity-enum';
 import { BoundingRect } from '../world/entities/debug/bounding-rect';
+import { Point } from '../world/geometry/shapes';
+import { Entity } from '../world/entities/entity';
+import { Pipe } from '../world/entities/pipe/pipe';
+import { EditDrawerItem } from './top-tools/edit-drawer/edit-drawer';
+import { AddDrawerItem } from './top-tools/add-drawer/add-drawer';
 
 export function App() {
   const [ entities, _setEntities ] = useState([]);
@@ -23,21 +29,21 @@ export function App() {
   const [ drawRt, setDrawRt ] = useState(null);
 
   const [ editMode, setEditMode ] = useState(null);
-  const [ editState, setEditState ] = useState(EDITOR_STATES.PASSIVE);
+  const [ editState, setEditState ] = useState<keyof EditorStates>(EDITOR_STATES.PASSIVE);
   const [ editAction, setEditAction ] = useState(null);
 
   const [ pipeOrigin, setPipeOrigin ] = useState({});
-  const pipeRef = useRef();
+  const pipeRef = useRef<Pipe>();
 
-  const setEntities = (entities) => {
+  const setEntities = (entities: Entity[]) => {
     // always perform an array copy to tell child components to update
     _setEntities(entities.slice());
   };
 
   useEffect(() => {
-    let worldDeregisterCb, drawDeregisterCb, _drawRt;
+    let worldDeregisterCb: () => unknown, drawDeregisterCb: () => unknown, _drawRt;
     _drawRt = new Runtime({
-      tickInterval: 1000 / 120 // 120 fps
+      tickInterval: 1000 / 60 // 60 fps
     });
     setDrawRt(_drawRt);
 
@@ -58,8 +64,8 @@ export function App() {
     };
   }, []);
 
-  const handleClick = (evt) => {
-    let nextEditState, ctrlResult;
+  const handleClick = (evt: Point) => {
+    let nextEditState: keyof EditorStates, ctrlResult;
     nextEditState = editCtrl.getEditState({
       editMode,
       editAction,
@@ -81,7 +87,7 @@ export function App() {
     }
   };
 
-  const handleMouseMove = (evt) => {
+  const handleMouseMove = (evt: Point) => {
     switch(editState) {
       case EDITOR_STATES.DRAW:
         handleDrawMouseMove(evt);
@@ -91,26 +97,26 @@ export function App() {
         break;
     }
 
-    function handleDrawMouseMove(evt) {
+    function handleDrawMouseMove(evt: Point) {
       switch(editAction) {
         case ENTITY_ENUM.PIPE:
           handlePipeDrawMouseMove(evt);
           break;
       }
-      function handlePipeDrawMouseMove(evt) {
+      function handlePipeDrawMouseMove(evt: Point) {
         if(pipeRef.current && (pipeRef.current.entityType === ENTITY_ENUM.PIPE)) {
           pipeRef.current.setEndPoint(evt.x, evt.y);
         }
       }
     };
 
-    function handlePassiveMouseMove(evt) {
+    function handlePassiveMouseMove(evt: Point) {
       switch(editAction) {
         case ENTITY_ENUM.PIPE:
           handlePipePassiveMouseMove(evt);
           break;
       }
-      function handlePipePassiveMouseMove(evt) {
+      function handlePipePassiveMouseMove(evt: Point) {
         let collidedEntities, boundingRects;
         collidedEntities = world.getBoundingCollisionsByPoint(evt);
         boundingRects = collidedEntities.map(entity => {
@@ -130,15 +136,15 @@ export function App() {
     setRunning(world.running);
   };
 
-  const handleEditorChange = (mode, selected) => {
+  const handleEditorChange = (mode: keyof typeof EDIT_MODES, selected: AddDrawerItem | EditDrawerItem) => {
     let selectedEditAction;
     if(selected !== undefined) {
       switch(mode) {
         case EDIT_MODES.ADD:
-          selectedEditAction = selected.entityType;
+          selectedEditAction = (selected as AddDrawerItem).entityType;
           break;
         case EDIT_MODES.EDIT:
-          selectedEditAction = selected.editType;
+          selectedEditAction = (selected as EditDrawerItem).editType;
           break;
       }
     }

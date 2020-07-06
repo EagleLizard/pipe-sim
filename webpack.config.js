@@ -1,9 +1,9 @@
 /* === dont forget to import scss to main.js file === */
 /* ===> import './main.scss'; <=== */
 
-const path = require("path");
+const path = require('path');
 
-const HtmlWebPackPlugin = require("html-webpack-plugin");
+const HtmlWebPackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const DIST_DIR = path.resolve(__dirname, 'dist');
@@ -20,9 +20,9 @@ module.exports = (env, argv) => {
     filename: isDevelopment ? '[name].css' : '[name].[hash].css',
     chunkFilename: isDevelopment ? '[id].css' : '[id].[hash].css'
   });
-  
+
   webpackConfig = {
-    entry: './src/main.js',
+    entry: './src/main.tsx',
     output: {
       path: DIST_DIR,
       filename: 'bundle.js'
@@ -34,12 +34,21 @@ module.exports = (env, argv) => {
     },
     module: {
       rules: [
+        // {
+        //   test: /\.js$/,
+        //   exclude: /node_modules/,
+        //   use: {
+        //     loader: 'babel-loader'
+        //   }
+        // },
         {
-          test: /\.js$/,
+          test: /\.ts(x?)$/,
           exclude: /node_modules/,
-          use: {
-            loader: 'babel-loader'
-          }
+          use: [
+            {
+              loader: 'ts-loader',
+            }
+          ]
         },
         {
           test: /\.s?css$/,
@@ -55,45 +64,34 @@ module.exports = (env, argv) => {
               options: { importLoaders: 2 }, // tell if that you are running your styles through two other loaders before this one should run
             },
             {
-                loader: 'postcss-loader',
+              loader: 'postcss-loader',
             },
             {
               loader: 'sass-loader' // compiles Sass to CSS
             }
           ]
         },
-        // {
-        //   test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
-        //   exclude: /node_modules/,
-        //   use: [
-        //     {
-        //       loader: 'file-loader',
-        //     },
-        //   ]
-        // },
         {
           test: /\.(png|jpe?g|gif|svg|eot|ttf|woff|woff2)$/,
           loader: 'url-loader',
           options: {
-              limit: 10000,
+            limit: 10000,
           },
         },
 
       ]
     },
-    resolve: {      
+    resolve: {
       alias: {
         'react': path.resolve(__dirname, './node_modules/react'),
         'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
-      }
+      },
+      extensions: [ '.ts', '.tsx', '.js' ],
     },
     plugins: [
       htmlPlugin,
       miniCssExtractPlugin
     ]
   };
-  if(!isDevelopment) {
-    
-  }
   return webpackConfig;
-}
+};

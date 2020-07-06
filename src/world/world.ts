@@ -1,23 +1,24 @@
 
-import { Graph } from '@dagrejs/graphlib';
-
-import { Runtime } from './runtime';
-import { Station } from './entities/station/station';
+import { Runtime, TickCb } from './runtime';
 import { Pipe } from './entities/pipe/pipe';
 
 import { isPointInBoundingRect } from './geometry/collision';
+import { Entity } from './entities/entity';
+import { Point } from './geometry/shapes';
 
 export class World {
-  constructor() {
-    this.graph = new Graph({
-      multigraph: true,
+  runtime: Runtime;
+  entities: Entity[];
+  idCounter: number;
+  constructor(tickInterval: number) {
+    this.runtime = new Runtime({
+      tickInterval,
     });
-    this.runtime = new Runtime();
     this.entities = [];
     this.idCounter = 0;
   }
 
-  onTick(cb) {
+  onTick(cb: TickCb) {
     return this.runtime.onTick(cb);
   }
 
@@ -33,24 +34,14 @@ export class World {
     return this.idCounter++;
   }
 
-  createStation(x, y) {
-    let station;
-    station = new Station(this.idCounter++, {
-      x,
-      y,
-    });
-    this.entities.push(station);
-    return station;
-  }
-
-  createPipe(x, y) {
+  createPipe(x: number, y: number) {
     let pipe;
     pipe = new Pipe(this.getId(), { x, y });
     this.entities.push(pipe);
     return pipe;
   }
 
-  getBoundingCollisionsByPoint(point) {
+  getBoundingCollisionsByPoint(point: Point) {
     let collidedEntities;
     collidedEntities = this.entities.reduce((acc, curr) => {
       let collision, boundingRect;

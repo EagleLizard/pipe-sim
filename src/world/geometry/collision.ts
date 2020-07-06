@@ -1,5 +1,8 @@
 
-export function isPointInBoundingRect(point, boundingRect) {
+import { Point, Rect } from './shapes';
+import { EntityBoundingRect } from '../entities/entity';
+
+export function isPointInBoundingRect(point: Point, boundingRect: EntityBoundingRect) {
   const { x, y } = point;
   const { top, right, left, bottom } = boundingRect;
   return (x < right)
@@ -8,7 +11,7 @@ export function isPointInBoundingRect(point, boundingRect) {
   && (y < bottom);
 }
 
-export function boundingRectToRect(boundingRect) {
+export function boundingRectToRect(boundingRect: EntityBoundingRect): Rect {
   let x, y, width, height;
   const { top, right, bottom, left } = boundingRect;
   x = left;
